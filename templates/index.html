@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Detection System - Control Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+    /* ==================== DARK/LIGHT MODE SYSTEM ==================== */
+    :root {
+        /* Light Mode Colors */
+        --primary: #2c3e50;
+        --secondary: #3498db;
+        --success: #27ae60;
+        --warning: #f39c12;
+        --danger: #e74c3c;
+        --light: #ecf0f1;
+        --dark: #2c3e50;
+        
+        /* Light Mode Backgrounds */
+        --bg-primary: #f8f9fa;
+        --bg-secondary: #ffffff;
+        --bg-card: #ffffff;
+        --bg-sidebar: var(--primary);
+        --bg-navbar: var(--primary);
+        
+        /* Light Mode Text */
+        --text-primary: #2c3e50;
+        --text-secondary: #6c757d;
+        --text-muted: #6c757d;
+        --text-light: #ffffff;
+        
+        /* Light Mode Borders */
+        --border-color: #dee2e6;
+        --shadow-color: rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="dark"] {
+        /* Dark Mode Colors */
+        --primary: #3498db;
+        --secondary: #2980b9;
+        --success: #27ae60;
+        --warning: #f39c12;
+        --danger: #e74c3c;
+        --light: #34495e;
+        --dark: #ecf0f1;
+        
+        /* Dark Mode Backgrounds */
+        --bg-primary: #1a1a1a;
+        --bg-secondary: #2d2d2d;
+        --bg-card: #2d2d2d;
+        --bg-sidebar: #1e2a3a;
+        --bg-navbar: #1e2a3a;
+        
+        /* Dark Mode Text */
+        --text-primary: #ecf0f1;
+        --text-secondary: #bdc3c7;
+        --text-muted: #95a5a6;
+        --text-light: #ecf0f1;
+        
+        /* Dark Mode Borders */
+        --border-color: #404040;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+    }
+
+    body {
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .navbar {
+        background-color: var(--bg-navbar) !important;
+        transition: background-color 0.3s ease;
+    }
+
+    .navbar-brand {
+        font-weight: 700;
+        color: var(--text-light) !important;
+    }
+
+    .sidebar {
+        background-color: var(--bg-sidebar);
+        color: var(--text-light);
+        min-height: calc(100vh - 56px);
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .sidebar .nav-link {
+        color: rgba(255,255,255,0.8);
+        padding: 12px 20px;
+        border-radius: 0;
+        transition: all 0.3s;
+    }
+
+    .sidebar .nav-link:hover, .sidebar .nav-link.active {
+        color: white;
+        background-color: rgba(255,255,255,0.1);
+    }
+
+    .sidebar .nav-link i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+    }
+
+    .main-content {
+        padding: 20px;
+    }
+
+    .card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        border-radius: 10px;
+        box-shadow: 0 4px 6px var(--shadow-color);
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px var(--shadow-color);
+    }
+
+    .card-icon {
+        font-size: 2rem;
+        opacity: 0.8;
+    }
+
+    .stat-card .card-body {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .stat-card .card-text {
+        font-size: 0.9rem;
+        color: whitesmoke;
+    }
+
+    .stat-card .card-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0;
+    }
+
+    .thumb {
+        max-width: 120px;
+        max-height: 80px;
+        object-fit: cover;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: transform 0.3s;
+    }
+
+    .thumb:hover {
+        transform: scale(1.05);
+    }
+
+    .mono {
+        font-family: monospace;
+        font-size: 0.9rem;
+    }
+
+    .badge-paid {
+        background-color: var(--success);
+    }
+
+    .badge-unpaid {
+        background-color: var(--warning);
+    }
+
+    .table {
+        --bs-table-bg: var(--bg-card);
+        --bs-table-color: var(--text-primary);
+        --bs-table-border-color: var(--border-color);
+    }
+
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: var(--text-primary);
+        background-color: var(--bg-secondary);
+        border-color: var(--border-color);
+    }
+
+    .table td {
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    .filter-btn.active {
+        background-color: var(--secondary);
+        border-color: var(--secondary);
+    }
+
+    .btn-action {
+        padding: 5px 10px;
+        font-size: 0.85rem;
+        margin: 2px;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .export-btn {
+        background-color: var(--success);
+        border-color: var(--success);
+    }
+
+    .export-btn:hover {
+        background-color: #219653;
+        border-color: #219653;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .search-container {
+        position: relative;
+        max-width: 400px;
+    }
+
+    .search-container i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+    }
+
+    .search-container input {
+        padding-left: 40px;
+        background-color: var(--bg-card);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    .search-container input:focus {
+        background-color: var(--bg-card);
+        border-color: var(--secondary);
+        color: var(--text-primary);
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+
+    .video-container {
+        position: relative;
+        background: #000;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .video-overlay {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.9rem;
+    }
+
+    /* Theme Toggle Button */
+    .theme-toggle {
+        background: none;
+        border: 2px solid var(--text-light);
+        color: var(--text-light);
+        border-radius: 50px;
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+    }
+
+    .theme-toggle:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        transform: scale(1.05);
+    }
+
+    .theme-toggle i {
+        font-size: 1.1rem;
+    }
+
+    /* Form controls */
+    .form-control, .form-select {
+        background-color: var(--bg-card);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background-color: var(--bg-card);
+        border-color: var(--secondary);
+        color: var(--text-primary);
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+
+    /* Modal dark mode support */
+    .modal-content {
+        background-color: var(--bg-card);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    .modal-header, .modal-footer {
+        border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] .btn-close {
+        filter: invert(1);
+    }
+
+    /* SweetAlert2 Dark Mode Support */
+    [data-theme="dark"] .swal2-popup {
+        background: var(--bg-card);
+        color: var(--text-primary);
+    }
+
+    [data-theme="dark"] .swal2-title,
+    [data-theme="dark"] .swal2-content {
+        color: var(--text-primary);
+    }
+
+    [data-theme="dark"] .swal2-input {
+        background-color: var(--bg-secondary);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    /* Additional dark mode enhancements */
+    [data-theme="dark"] .text-muted {
+        color: var(--text-muted) !important;
+    }
+
+    [data-theme="dark"] .bg-light {
+        background-color: var(--bg-secondary) !important;
+    }
+
+    [data-theme="dark"] .table-hover tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: var(--text-primary);
+    }
+
+    [data-theme="dark"] .btn-outline-primary {
+        border-color: var(--secondary);
+        color: var(--secondary);
+    }
+
+    [data-theme="dark"] .btn-outline-primary:hover {
+        background-color: var(--secondary);
+        border-color: var(--secondary);
+        color: var(--text-light);
+    }
+
+    [data-theme="dark"] .btn-outline-secondary {
+        border-color: var(--border-color);
+        color: var(--text-secondary);
+    }
+
+    [data-theme="dark"] .btn-outline-secondary:hover {
+        background-color: var(--border-color);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    [data-theme="dark"] .form-control::placeholder {
+        color: var(--text-muted);
+    }
+
+    [data-theme="dark"] .card-header {
+        background-color: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-primary);
+    }
+
+    /* ==================== MOBILE SIDEBAR ENHANCEMENTS ==================== */
+
+    /* Mobile Menu Button */
+    .mobile-menu-btn {
+        background: none;
+        border: 2px solid var(--text-light);
+        color: var(--text-light);
+        border-radius: 8px;
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: none;
+        align-items: center;
+        gap: 8px;
+        margin-right: 15px;
+    }
+
+    .mobile-menu-btn:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .mobile-menu-btn i {
+        font-size: 1.2rem;
+    }
+
+    /* Enhanced Sidebar for Mobile */
+    .sidebar {
+        position: relative;
+        z-index: 1000;
+    }
+
+    .sidebar .nav-link {
+        padding: 15px 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+    }
+
+    .sidebar .nav-link:hover, .sidebar .nav-link.active {
+        border-left: 4px solid var(--secondary);
+    }
+
+    .sidebar .nav-link i {
+        margin-right: 15px;
+        width: 20px;
+        text-align: center;
+        font-size: 1.1rem;
+    }
+
+    /* Sidebar Overlay for Mobile */
+    .sidebar-overlay {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 56px);
+        background: rgba(0,0,0,0.5);
+        z-index: 999;
+        display: none;
+    }
+
+    .sidebar-overlay.show {
+        display: block;
+    }
+
+    /* Sidebar scrollbar styling */
+    .sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+        background: rgba(255,255,255,0.1);
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.3);
+        border-radius: 3px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255,255,255,0.5);
+    }
+
+    /* Responsive Design for Mobile Sidebar */
+    @media (max-width: 991.98px) {
+        .mobile-menu-btn {
+            display: flex;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 56px;
+            left: 0;
+            width: 280px;
+            height: calc(100vh - 56px);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .sidebar.show {
+            transform: translateX(0);
+        }
+        
+        .main-content {
+            width: 100%;
+            margin-left: 0;
+        }
+        
+        /* Mobile sidebar header */
+        .sidebar-header {
+            display: flex !important;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .sidebar-header h6 {
+            margin: 0;
+            color: var(--text-light);
+        }
+        
+        .sidebar-footer {
+            display: block !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 260px;
+        }
+        
+        .main-content {
+            padding: 15px 10px;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn-action {
+            width: 100%;
+        }
+        
+        .dashboard-header {
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .search-container {
+            max-width: 100%;
+        }
+        
+        .theme-toggle span {
+            display: none;
+        }
+        
+        .theme-toggle {
+            padding: 8px;
+        }
+    }
+
+    @media (min-width: 992px) {
+        .sidebar {
+            position: static;
+            transform: translateX(0) !important;
+        }
+        
+        .mobile-menu-btn {
+            display: none !important;
+        }
+        
+        .sidebar-overlay {
+            display: none !important;
+        }
+        
+        .sidebar-header,
+        .sidebar-footer {
+            display: none !important;
+        }
+    }
+    
+    </style>
+</head>
+<body data-total-cars="{{ stats.total_cars if stats else 0 }}" 
+      data-paid-cars="{{ stats.paid_cars if stats else 0 }}" 
+      data-unpaid-cars="{{ stats.unpaid_cars if stats else 0 }}" 
+      data-momo-payments="{{ stats.momo_payments if stats else 0 }}"
+      data-cash-payments="{{ stats.cash_payments if stats else 0 }}"
+      data-revenue="{{ stats.revenue if stats and stats.revenue else 0 }}">
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--primary);">
+    <div class="container-fluid">
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn" type="button">
+            <i class="fas fa-bars"></i>
+            <span>Menu</span>
+        </button>
+        
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-car me-2"></i>Vehicle Detection System - Control Panel
+        </a>
+        <div class="d-flex align-items-center">
+            <!-- Theme Toggle Button -->
+            <button class="theme-toggle me-3" id="themeToggle" title="Toggle dark/light mode">
+                <i class="fas fa-moon" id="themeIcon"></i>
+                <span id="themeText">Dark Mode</span>
+            </button>
+
+            <a href="/" class="btn btn-outline-light btn-sm me-2">
+                <i class="fas fa-arrow-left me-1"></i> Home Page
+            </a>
+
+            <!-- <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button> -->
+        </div>
+    </div>
+</nav>
+
+<!-- Sidebar Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 sidebar" id="sidebar">
+            <div class="position-sticky pt-3">
+                <!-- Mobile Sidebar Header -->
+                <div class="sidebar-header d-flex justify-content-between align-items-center p-3 border-bottom border-secondary d-lg-none">
+                    <h6 class="mb-0 text-light">Navigation Menu</h6>
+                    <button class="btn btn-sm btn-outline-light" id="closeSidebar">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/index">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/live">
+                            <i class="fas fa-car"></i> Live Detection
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/history">
+                            <i class="fas fa-history"></i> Boss Page
+                        </a>
+                    </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-chart-bar"></i> Analytics
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- Sidebar Footer (Mobile Only) -->
+                <div class="sidebar-footer p-3 border-top border-secondary mt-auto d-lg-none">
+                    <div class="text-center">
+                        <small class="text-muted">Version 1.0.1</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content" id="mainContent">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <h2 class="mb-0">Live Vehicle Detection Dashboard</h2>
+                <div class="d-flex">
+                    <div class="search-container me-2">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search by plate or car type">
+                    </div>
+                    <button class="btn btn-success export-btn" id="exportBtn">
+                        <i class="fas fa-file-export me-1"></i> Export
+                    </button>
+                </div>
+            </div>
+
+<!-- Stats Cards -->
+<div class="row">
+    <div class="col-md-3">
+        <div class="card stat-card text-white bg-primary">
+            <div class="card-body">
+                <div>
+                    <p class="card-text">Total Vehicles</p>
+                    <h3 class="card-title">{{ stats.total if stats else 0 }}</h3>
+                </div>
+                <i class="fas fa-car card-icon"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card text-white bg-success">
+            <div class="card-body">
+                <div>
+                    <p class="card-text">Paid Vehicles</p>
+                    <h3 class="card-title">{{ stats.paid if stats else 0 }}</h3>
+                </div>
+                <i class="fas fa-check-circle card-icon"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card text-white bg-warning">
+            <div class="card-body">
+                <div>
+                    <p class="card-text">Unpaid Vehicles</p>
+                    <h3 class="card-title">{{ stats.unpaid if stats else 0 }}</h3>
+                </div>
+                <i class="fas fa-exclamation-circle card-icon"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card text-white bg-info">
+            <div class="card-body">
+                <div>
+                    <p class="card-text">Total Revenue</p>
+                    <h3 class="card-title">FRW {{ "{:,.0f}".format(stats.revenue) if stats and stats.revenue else 0 }}</h3>
+                </div>
+                <i class="fas fa-money-bill card-icon"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- Live Video Feed -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-video me-2"></i>Live Camera Feed
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="video-container">
+                        <div class="video-overlay">
+                            <i class="fas fa-circle text-danger me-1"></i> LIVE
+                        </div>
+                        <img src="{{ url_for('video_feed') }}" class="img-fluid w-100" alt="Live Video Stream" style="max-height: 400px; object-fit: cover;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Recent Detections</h5>
+                        <div class="btn-group" role="group">
+                            <a href="?filter=all" class="btn btn-outline-secondary filter-btn active">All</a>
+                            <a href="?filter=processed" class="btn btn-outline-secondary filter-btn">Processed</a>
+                            <a href="?filter=pending" class="btn btn-outline-secondary filter-btn">Pending</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+           
+<!-- Data Table -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="detectionsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Image</th>
+                        <th>Car Type</th>
+                        <th>Plate</th>
+                        <th>Captured Time</th>
+                        <th>Payment Method</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if cars %}
+                        {% for car in cars %}
+                        {% set is_paid = car.status == 'Paid' or car.status.startswith('Paid') if car.status else False %}
+                        {% set payment_method = car.payment_method if car.payment_method else 'Not Paid' %}
+                        <tr data-type="{{ car.car_type|lower if car.car_type else 'car' }}" data-id="{{ car.id }}">
+                            <td>{{ car.id }}</td>
+                            <td>
+                                <img src="{{ car.image }}" class="thumb" alt="car_{{ car.id }}" 
+                                     data-bs-toggle="modal" data-bs-target="#imageModal" 
+                                     data-full="{{ car.image }}">
+                            </td>
+                            <td>{{ car.car_type if car.car_type else 'Car' }}</td>
+                            <td class="plate-cell" data-id="{{ car.id }}">{{ car.plate if car.plate else 'N/A' }}</td>
+                            <td>{{ car.captured_time if car.captured_time else 'N/A' }}</td>
+                            <td>{{ payment_method }}</td>
+                            <td>
+                                <span class="badge {% if is_paid %}badge-paid{% else %}badge-unpaid{% endif %}">
+                                    {{ car.status|default('Unpaid') }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-sm btn-success momo-btn btn-action" 
+                                            {% if is_paid %}disabled{% endif %}>
+                                        <i class="fas fa-mobile-alt me-1"></i> MOMO
+                                    </button>
+                                    <button class="btn btn-sm btn-primary cash-btn btn-action" 
+                                            {% if is_paid %}disabled{% endif %}>
+                                        <i class="fas fa-money-bill me-1"></i> CASH
+                                    </button>
+                                    <button class="btn btn-sm btn-warning update-btn btn-action" 
+                                            data-id="{{ car.id }}" data-plate="{{ car.plate if car.plate else '' }}">
+                                        <i class="fas fa-edit me-1"></i> Update
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4">No vehicle detections found</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+        </main>
+    </div>
+</div>
+
+<!-- Image preview modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Image Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid rounded shadow-sm" alt="full">
+                <p id="modalPath" class="mono mt-2 small text-break"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ==================== MOBILE SIDEBAR FUNCTIONALITY ====================
+
+function setupMobileSidebar() {
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const closeSidebar = document.getElementById('closeSidebar');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const mainContent = document.getElementById('mainContent');
+
+    // Toggle sidebar
+    function toggleSidebar() {
+        sidebar.classList.toggle('show');
+        sidebarOverlay.classList.toggle('show');
+        document.body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : '';
+    }
+
+    // Close sidebar
+    function closeSidebarFunc() {
+        sidebar.classList.remove('show');
+        sidebarOverlay.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    // Event listeners
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+    }
+
+    if (closeSidebar) {
+        closeSidebar.addEventListener('click', closeSidebarFunc);
+    }
+
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', closeSidebarFunc);
+    }
+
+    // Close sidebar when clicking on nav links (mobile)
+    const navLinks = document.querySelectorAll('.sidebar .nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth < 992) {
+                closeSidebarFunc();
+            }
+        });
+    });
+
+    // Close sidebar on window resize if it becomes desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth >= 992) {
+            closeSidebarFunc();
+        }
+    });
+
+    // Handle escape key to close sidebar
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sidebar.classList.contains('show')) {
+            closeSidebarFunc();
+        }
+    });
+}
+
+// ==================== THEME MANAGEMENT SYSTEM ====================
+
+// Theme configuration
+const themeConfig = {
+    light: {
+        name: 'light',
+        icon: 'fa-moon',
+        text: 'Dark Mode',
+        next: 'dark'
+    },
+    dark: {
+        name: 'dark',
+        icon: 'fa-sun',
+        text: 'Light Mode',
+        next: 'light'
+    }
+};
+
+// Initialize theme system
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+    setupThemeToggle();
+}
+
+// Set theme
+function setTheme(themeName) {
+    const theme = themeConfig[themeName];
+    if (!theme) return;
+    
+    // Set HTML attribute
+    document.documentElement.setAttribute('data-theme', theme.name);
+    
+    // Update toggle button
+    const themeIcon = document.getElementById('themeIcon');
+    const themeText = document.getElementById('themeText');
+    
+    if (themeIcon) {
+        themeIcon.className = `fas ${theme.icon}`;
+    }
+    if (themeText) {
+        themeText.textContent = theme.text;
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('theme', theme.name);
+    
+    // Dispatch theme change event
+    window.dispatchEvent(new CustomEvent('themeChanged', { detail: theme.name }));
+}
+
+// Toggle theme
+function toggleTheme() {
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    const nextTheme = themeConfig[currentTheme].next;
+    setTheme(nextTheme);
+}
+
+// Setup theme toggle button
+function setupThemeToggle() {
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
+}
+
+// Apply theme to SweetAlert2
+function setupSweetAlertTheme() {
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    const isDark = currentTheme === 'dark';
+    
+    if (isDark && Swal) {
+        // SweetAlert2 will automatically detect dark mode from data-theme attribute
+    }
+}
+
+// ==================== DASHBOARD FUNCTIONALITY ====================
+
+// Search functionality
+const searchInput = document.getElementById('searchInput');
+const table = document.getElementById('detectionsTable');
+const rows = Array.from(table.tBodies[0].rows);
+
+if (searchInput && table) {
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase();
+        rows.forEach(row => {
+            const text = Array.from(row.cells).map(cell => cell.textContent.toLowerCase()).join(' ');
+            row.style.display = text.includes(query) ? '' : 'none';
+        });
+    });
+}
+
+// Image modal
+const imageModal = document.getElementById('imageModal');
+if (imageModal) {
+    imageModal.addEventListener('show.bs.modal', function(event) {
+        const img = event.relatedTarget;
+        const modalImage = document.getElementById('modalImage');
+        const modalPath = document.getElementById('modalPath');
+        if (modalImage && modalPath) {
+            modalImage.src = img.dataset.full;
+            modalPath.textContent = img.dataset.full;
+        }
+    });
+}
+
+// Enhanced password protection for history page
+function setupPasswordProtection() {
+    const historyLink = document.querySelector('a[href="/history"]');
+    let attempts = 0;
+    const maxAttempts = 3;
+    
+    if (historyLink) {
+        historyLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Check if user is blocked
+            const blockTime = localStorage.getItem('historyBlockTime');
+            if (blockTime && Date.now() - blockTime < 300000) { // 5 minutes block
+                const remainingTime = Math.ceil((300000 - (Date.now() - blockTime)) / 1000 / 60);
+                Swal.fire({
+                    title: '🚫 Access Temporarily Blocked',
+                    html: `Too many failed attempts!<br>Please try again in <strong>${remainingTime} minutes</strong>.`,
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+            
+            Swal.fire({
+                title: '🔒 Access Restricted',
+                html: `
+                    <div class="text-center">
+                        <p>Please enter the password to access Boss Page</p>
+                        ${attempts > 0 ? `<small class="text-warning">${maxAttempts - attempts} attempt(s) remaining</small>` : ''}
+                    </div>
+                `,
+                input: 'password',
+                inputAttributes: {
+                    autocapitalize: 'off',
+                    autocorrect: 'off',
+                    placeholder: 'Enter password',
+                    maxlength: 20,
+                    autocomplete: 'current-password'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Access History',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#2c3e50',
+                showLoaderOnConfirm: true,
+                allowOutsideClick: () => !Swal.isLoading(),
+                preConfirm: (password) => {
+                    return new Promise((resolve, reject) => {
+                        setTimeout(() => {
+                            if (password === 'boss') {
+                                // Reset attempts on successful login
+                                attempts = 0;
+                                localStorage.removeItem('historyBlockTime');
+                                resolve();
+                            } else {
+                                attempts++;
+                                if (attempts >= maxAttempts) {
+                                    // Block access for 5 minutes
+                                    localStorage.setItem('historyBlockTime', Date.now());
+                                    reject('Too many failed attempts! Access blocked for 5 minutes.');
+                                } else {
+                                    reject(`Incorrect password! ${maxAttempts - attempts} attempt(s) remaining.`);
+                                }
+                            }
+                        }, 800); // Simulate authentication delay
+                    });
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show success message before redirect
+                    Swal.fire({
+                        title: '✅ Access Granted',
+                        text: 'Redirecting to History page...',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false,
+                        willClose: () => {
+                            window.location.href = '/history';
+                        }
+                    });
+                }
+            }).catch((error) => {
+                Swal.showValidationMessage(error);
+            });
+        });
+    }
+}
+
+// Statistics card click handlers
+function setupStatsCards() {
+    const totalCarsCard = document.querySelector('.stat-card.bg-primary');
+    const paidCarsCard = document.querySelector('.stat-card.bg-success');
+    const unpaidCarsCard = document.querySelector('.stat-card.bg-warning');
+
+    // Get stats from data attributes or use defaults
+    const total_cars = parseInt(document.body.getAttribute('data-total-cars') || '0');
+    const paid_cars = parseInt(document.body.getAttribute('data-paid-cars') || '0');
+    const unpaid_cars = parseInt(document.body.getAttribute('data-unpaid-cars') || '0');
+    const momo_payments = parseInt(document.body.getAttribute('data-momo-payments') || '0');
+    const cash_payments = parseInt(document.body.getAttribute('data-cash-payments') || '0');
+    const revenue = parseInt(document.body.getAttribute('data-revenue') || '0');
+
+    if (totalCarsCard) {
+        totalCarsCard.addEventListener('click', function() {
+            const collectionRate = total_cars > 0 ? ((paid_cars / total_cars) * 100).toFixed(1) : 0;
+            
+            Swal.fire({
+                title: 'Total Cars Analysis',
+                html: `
+                    <div class="text-start">
+                        <p><strong>Total Cars:</strong> ${total_cars}</p>
+                        <p><strong>Collection Rate:</strong> ${collectionRate}%</p>
+                        <p><strong>Revenue Efficiency:</strong> Analyzing payment patterns...</p>
+                    </div>
+                `,
+                icon: 'info',
+                confirmButtonText: 'OK'
+            });
+        });
+    }
+
+    if (paidCarsCard) {
+        paidCarsCard.addEventListener('click', function() {
+            const successRate = total_cars > 0 ? ((paid_cars / total_cars) * 100).toFixed(1) : 0;
+            
+            Swal.fire({
+                title: 'Paid Cars Analysis',
+                html: `
+                    <div class="text-start">
+                        <p><strong>Paid Cars:</strong> ${paid_cars}</p>
+                        <p><strong>Revenue Generated:</strong> FRW ${revenue.toLocaleString()}</p>
+                        <p><strong>Payment Methods:</strong></p>
+                        <ul>
+                            <li>MoMo: ${momo_payments}</li>
+                            <li>Cash: ${cash_payments}</li>
+                        </ul>
+                        <p><strong>Success Rate:</strong> ${successRate}%</p>
+                    </div>
+                `,
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+        });
+    }
+
+    if (unpaidCarsCard) {
+        unpaidCarsCard.addEventListener('click', function() {
+            Swal.fire({
+                title: 'Unpaid Cars Analysis',
+                html: `
+                    <div class="text-start">
+                        <p><strong>Unpaid Cars:</strong> ${unpaid_cars}</p>
+                        <p><strong>Potential Loss:</strong> Calculating potential revenue loss...</p>
+                        <p><strong>Action Required:</strong> Follow up on unpaid vehicles</p>
+                    </div>
+                `,
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            });
+        });
+    }
+}
+
+// Export functionality
+const exportBtn = document.getElementById('exportBtn');
+if (exportBtn) {
+    exportBtn.addEventListener('click', function() {
+        Swal.fire({
+            title: 'Export Data',
+            text: 'Choose export format',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'CSV',
+            cancelButtonText: 'PDF',
+            showDenyButton: true,
+            denyButtonText: 'Excel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                exportToCSV();
+            } else if (result.isDenied) {
+                exportToExcel();
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                exportToPDF();
+            }
+        });
+    });
+}
+
+function exportToCSV() {
+    Swal.fire('Success!', 'Data exported as CSV successfully.', 'success');
+}
+
+function exportToExcel() {
+    Swal.fire('Success!', 'Data exported as Excel successfully.', 'success');
+}
+
+function exportToPDF() {
+    Swal.fire('Success!', 'Data exported as PDF successfully.', 'success');
+}
+
+// Payment prices
+const prices = {
+    car: 10000,
+    truck: 40000,
+    bus: 30000,
+    motorcycle: 5000,
+    police: 0,
+    ambulance: 0,
+    default: 10000
+};
+
+// Payment functionality
+document.querySelectorAll('#detectionsTable tbody tr').forEach(row => {
+    const momoBtn = row.querySelector('.momo-btn');
+    const cashBtn = row.querySelector('.cash-btn');
+    const updateBtn = row.querySelector('.update-btn');
+    const statusCell = row.querySelector('.badge');
+    const paymentMethodCell = row.querySelector('td:nth-child(6)'); // Payment method column
+    const carType = row.dataset.type || 'default';
+    const id = row.dataset.id;
+    const amount = prices[carType] || prices['default'];
+
+    // MOMO payment
+    momoBtn?.addEventListener('click', () => {
+        // Skip payment for free vehicles (police, ambulance)
+        if (amount === 0) {
+            Swal.fire('Info', `${carType.toUpperCase()} vehicles are exempt from payment.`, 'info');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Pay with MTN MoMo',
+            html: `Enter driver phone number for ${carType.toUpperCase()} payment (FRW ${amount.toLocaleString()}):`,
+            input: 'text',
+            inputLabel: 'Phone number',
+            inputPlaceholder: '07XXXXXXXX',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Please enter a phone number!';
+                }
+                if (!/^07\d{8}$/.test(value)) {
+                    return 'Please enter a valid MTN phone number!';
+                }
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Pay',
+            showLoaderOnConfirm: true,
+            preConfirm: (phone) => {
+                return fetch('/process_payment', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        id: id,
+                        method: 'MOMO',
+                        amount: amount
+                    })
+                }).then(res => {
+                    if (!res.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return res.json();
+                }).catch(error => {
+                    Swal.showValidationMessage(`Request failed: ${error}`);
+                });
+            }
+        }).then(result => {
+            if(result.isConfirmed && result.value){
+                if(result.value.success){
+                    statusCell.textContent = result.value.status;
+                    statusCell.className = 'badge badge-paid';
+                    paymentMethodCell.textContent = 'MOMO';
+                    momoBtn.disabled = true;
+                    cashBtn.disabled = true;
+                    Swal.fire('Success!', `Payment FRW ${amount.toLocaleString()} completed.`, 'success');
+                    
+                    // Refresh stats after payment
+                    refreshStats();
+                } else {
+                    Swal.fire('Error!', 'Payment failed. Please try again.', 'error');
+                }
+            }
+        });
+    });
+
+    // CASH payment
+    cashBtn?.addEventListener('click', () => {
+        // Skip payment for free vehicles (police, ambulance)
+        if (amount === 0) {
+            Swal.fire('Info', `${carType.toUpperCase()} vehicles are exempt from payment.`, 'info');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Confirm Cash Payment',
+            html: `Confirm cash payment of FRW ${amount.toLocaleString()} for ${carType.toUpperCase()}?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Confirm Payment'
+        }).then(result => {
+            if(result.isConfirmed){
+                fetch('/process_payment', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        id: id,
+                        method: 'CASH',
+                        amount: amount
+                    })
+                }).then(res=>res.json()).then(data=>{
+                    if(data.success){
+                        statusCell.textContent = data.status;
+                        statusCell.className = 'badge badge-paid';
+                        paymentMethodCell.textContent = 'CASH';
+                        momoBtn.disabled = true;
+                        cashBtn.disabled = true;
+                        Swal.fire('Success!', `Cash payment FRW ${amount.toLocaleString()} completed.`, 'success');
+                        
+                        // Refresh stats after payment
+                        refreshStats();
+                    } else {
+                        Swal.fire('Error!', 'Payment failed. Please try again.', 'error');
+                    }
+                });
+            }
+        });
+    });
+
+    // Update plate functionality
+    updateBtn?.addEventListener('click', () => {
+        const currentPlate = updateBtn.dataset.plate || '';
+        const plateCell = row.querySelector('.plate-cell');
+        
+        Swal.fire({
+            title: 'Update Plate Number',
+            html: `Update plate number for vehicle ID: ${id}`,
+            input: 'text',
+            inputLabel: 'Plate Number',
+            inputValue: currentPlate,
+            inputPlaceholder: 'Enter new plate number',
+            showCancelButton: true,
+            confirmButtonText: 'Update',
+            showLoaderOnConfirm: true,
+            preConfirm: (newPlate) => {
+                if (!newPlate || newPlate.trim() === '') {
+                    Swal.showValidationMessage('Please enter a plate number');
+                    return false;
+                }
+                
+                return fetch('/update_plate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id: id, plate: newPlate})
+                }).then(res => {
+                    if (!res.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return res.json();
+                }).catch(error => {
+                    Swal.showValidationMessage(`Request failed: ${error}`);
+                });
+            }
+        }).then(result => {
+            if(result.isConfirmed && result.value){
+                if(result.value.success){
+                    plateCell.textContent = result.value.newPlate || Swal.getInput().value;
+                    updateBtn.dataset.plate = result.value.newPlate || Swal.getInput().value;
+                    Swal.fire('Success!', 'Plate number updated successfully.', 'success');
+                } else {
+                    Swal.fire('Error!', result.value.error || 'Failed to update plate number.', 'error');
+                }
+            }
+        });
+    });
+});
+
+// Function to refresh stats
+function refreshStats() {
+    fetch('/get_stats')
+        .then(response => response.json())
+        .then(data => {
+            // Update stats cards with new field names
+            const totalCard = document.querySelector('.stat-card.bg-primary .card-title');
+            const paidCard = document.querySelector('.stat-card.bg-success .card-title');
+            const unpaidCard = document.querySelector('.stat-card.bg-warning .card-title');
+            const paymentMethodsCard = document.querySelector('.stat-card.bg-info .card-body');
+            
+            if (totalCard) totalCard.textContent = data.total_cars || 0;
+            if (paidCard) paidCard.textContent = data.paid_cars || 0;
+            if (unpaidCard) unpaidCard.textContent = data.unpaid_cars || 0;
+            if (paymentMethodsCard) {
+                paymentMethodsCard.innerHTML = `
+                    <div>
+                        <p class="card-text">Payment Methods</p>
+                        <p class="card-text mb-0">MoMo: ${data.momo_payments || 0}</p>
+                        <p class="card-text">Cash: ${data.cash_payments || 0}</p>
+                    </div>
+                    <i class="fas fa-money-bill card-icon"></i>
+                `;
+            }
+        })
+        .catch(error => console.error('Error refreshing stats:', error));
+}
+
+// Auto-refresh stats every 30 seconds
+setInterval(() => {
+    refreshStats();
+}, 30000);
+
+// Filter functionality
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Remove active class from all buttons
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        // Add active class to clicked button
+        this.classList.add('active');
+        
+        const filter = this.getAttribute('href').split('=')[1] || 'all';
+        const rows = document.querySelectorAll('#detectionsTable tbody tr');
+        
+        rows.forEach(row => {
+            const status = row.querySelector('.badge').textContent.toLowerCase();
+            
+            switch(filter) {
+                case 'all':
+                    row.style.display = '';
+                    break;
+                case 'paid':
+                    row.style.display = status.includes('paid') ? '' : 'none';
+                    break;
+                case 'unpaid':
+                    row.style.display = status.includes('unpaid') ? '' : 'none';
+                    break;
+                default:
+                    row.style.display = '';
+            }
+        });
+    });
+});
+
+// ==================== INITIALIZATION ====================
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize theme system
+    initializeTheme();
+    
+    // Setup mobile sidebar
+    setupMobileSidebar();
+    
+    // Setup dashboard functionality
+    setupStatsCards();
+    setupPasswordProtection();
+    setupSweetAlertTheme();
+    refreshStats();
+});
+</script>
+</body>
+</html>

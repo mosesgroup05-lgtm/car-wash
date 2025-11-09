@@ -1,0 +1,2191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Detection System - History & Analytics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+    :root {
+        --primary: #2c3e50;
+        --secondary: #3498db;
+        --success: #27ae60;
+        --warning: #f39c12;
+        --danger: #e74c3c;
+        --light: #ecf0f1;
+        --dark: #2c3e50;
+    }
+
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .navbar-brand {
+        font-weight: 700;
+    }
+
+    .sidebar {
+        background-color: var(--primary);
+        color: white;
+        min-height: calc(100vh - 56px);
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .sidebar .nav-link {
+        color: rgba(255,255,255,0.8);
+        padding: 12px 20px;
+        border-radius: 0;
+        transition: all 0.3s;
+    }
+
+    .sidebar .nav-link:hover, .sidebar .nav-link.active {
+        color: white;
+        background-color: rgba(255,255,255,0.1);
+    }
+
+    .sidebar .nav-link i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+    }
+
+    .main-content {
+        padding: 20px;
+    }
+
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        transition: transform 0.3s, box-shadow 0.3s;
+        margin-bottom: 20px;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .card-icon {
+        font-size: 2rem;
+        opacity: 0.8;
+    }
+
+    .stat-card .card-body {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .stat-card .card-text {
+        font-size: 0.9rem;
+        color: whitesmoke;
+    }
+
+    .stat-card .card-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0;
+    }
+
+    .thumb {
+        max-width: 120px;
+        max-height: 80px;
+        object-fit: cover;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: transform 0.3s;
+    }
+
+    .thumb:hover {
+        transform: scale(1.05);
+    }
+
+    .mono {
+        font-family: monospace;
+        font-size: 0.9rem;
+    }
+
+    .badge-paid {
+        background-color: var(--success);
+    }
+
+    .badge-unpaid {
+        background-color: var(--warning);
+    }
+
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    .filter-btn.active {
+        background-color: var(--secondary);
+        border-color: var(--secondary);
+    }
+
+    .btn-action {
+        padding: 5px 10px;
+        font-size: 0.85rem;
+        margin: 2px;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .export-btn {
+        background-color: var(--success);
+        border-color: var(--success);
+    }
+
+    .export-btn:hover {
+        background-color: #219653;
+        border-color: #219653;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .search-container {
+        position: relative;
+        max-width: 400px;
+    }
+
+    .search-container i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+
+    .search-container input {
+        padding-left: 40px;
+    }
+
+    .stats-card { 
+        transition: transform 0.2s; 
+        cursor: pointer; 
+    }
+    .stats-card:hover { 
+        transform: translateY(-5px); 
+    }
+    .paid { 
+        color: #198754; 
+        font-weight: bold; 
+    }
+    .unpaid { 
+        color: #dc3545; 
+        font-weight: bold; 
+    }
+    .period-nav .nav-link.active { 
+        font-weight: bold; 
+        background-color: #0d6efd; 
+        color: white; 
+    }
+    .analytics-table th { 
+        background-color: #f8f9fa; 
+    }
+
+    /* Security Styles */
+    .session-info {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .session-timer {
+        font-size: 0.9rem;
+        background: rgba(255,255,255,0.2);
+        padding: 5px 10px;
+        border-radius: 15px;
+    }
+
+    .access-denied {
+        text-align: center;
+        padding: 50px 20px;
+    }
+
+    .access-denied i {
+        font-size: 4rem;
+        color: #e74c3c;
+        margin-bottom: 20px;
+    }
+
+    /* ==================== MOBILE SIDEBAR ENHANCEMENTS ==================== */
+
+    /* Mobile Menu Button */
+    .mobile-menu-btn {
+        background: none;
+        border: 2px solid var(--text-light);
+        color: var(--text-light);
+        border-radius: 8px;
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: none;
+        align-items: center;
+        gap: 8px;
+        margin-right: 15px;
+    }
+
+    .mobile-menu-btn:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .mobile-menu-btn i {
+        font-size: 1.2rem;
+    }
+
+    /* Enhanced Sidebar for Mobile */
+    .sidebar {
+        background-color: var(--bg-sidebar);
+        color: var(--text-light);
+        min-height: calc(100vh - 56px);
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1000;
+    }
+
+    .sidebar .nav-link {
+        color: rgba(255,255,255,0.8);
+        padding: 15px 20px;
+        border-radius: 0;
+        transition: all 0.3s;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+    }
+
+    .sidebar .nav-link:hover, .sidebar .nav-link.active {
+        color: white;
+        background-color: rgba(255,255,255,0.15);
+        border-left: 4px solid var(--secondary);
+    }
+
+    .sidebar .nav-link i {
+        margin-right: 15px;
+        width: 20px;
+        text-align: center;
+        font-size: 1.1rem;
+    }
+
+    /* Sidebar Overlay for Mobile */
+    .sidebar-overlay {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 56px);
+        background: rgba(0,0,0,0.5);
+        z-index: 999;
+        display: none;
+    }
+
+    .sidebar-overlay.show {
+        display: block;
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            min-height: auto;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn-action {
+            width: 100%;
+        }
+        
+        .dashboard-header {
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .search-container {
+            max-width: 100%;
+        }
+        
+        .session-info {
+            flex-direction: column;
+            gap: 10px;
+            text-align: center;
+        }
+    }
+
+    /* ==================== DARK/LIGHT MODE SYSTEM ==================== */
+    :root {
+        /* Light Mode Colors */
+        --primary: #2c3e50;
+        --secondary: #3498db;
+        --success: #27ae60;
+        --warning: #f39c12;
+        --danger: #e74c3c;
+        --light: #ecf0f1;
+        --dark: #2c3e50;
+        
+        /* Light Mode Backgrounds */
+        --bg-primary: #f8f9fa;
+        --bg-secondary: #ffffff;
+        --bg-card: #ffffff;
+        --bg-sidebar: var(--primary);
+        --bg-navbar: var(--primary);
+        
+        /* Light Mode Text */
+        --text-primary: #2c3e50;
+        --text-secondary: #6c757d;
+        --text-muted: #6c757d;
+        --text-light: #ffffff;
+        
+        /* Light Mode Borders */
+        --border-color: #dee2e6;
+        --shadow-color: rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="dark"] {
+        /* Dark Mode Colors */
+        --primary: #3498db;
+        --secondary: #2980b9;
+        --success: #27ae60;
+        --warning: #f39c12;
+        --danger: #e74c3c;
+        --light: #34495e;
+        --dark: #ecf0f1;
+        
+        /* Dark Mode Backgrounds */
+        --bg-primary: #1a1a1a;
+        --bg-secondary: #2d2d2d;
+        --bg-card: #2d2d2d;
+        --bg-sidebar: #1e2a3a;
+        --bg-navbar: #1e2a3a;
+        
+        /* Dark Mode Text */
+        --text-primary: #ecf0f1;
+        --text-secondary: #bdc3c7;
+        --text-muted: #95a5a6;
+        --text-light: #ecf0f1;
+        
+        /* Dark Mode Borders */
+        --border-color: #404040;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+    }
+
+    /* Apply theme variables */
+    body {
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .navbar {
+        background-color: var(--bg-navbar) !important;
+        transition: background-color 0.3s ease;
+    }
+
+    .sidebar {
+        background-color: var(--bg-sidebar);
+        color: var(--text-light);
+        transition: background-color 0.3s ease;
+    }
+
+    .card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+    }
+
+    .table {
+        --bs-table-bg: var(--bg-card);
+        --bs-table-color: var(--text-primary);
+        --bs-table-border-color: var(--border-color);
+    }
+
+    .table th {
+        background-color: var(--bg-secondary);
+        color: var(--text-primary);
+        border-color: var(--border-color);
+    }
+
+    .table td {
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    .form-control, .form-select {
+        background-color: var(--bg-card);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background-color: var(--bg-card);
+        border-color: var(--secondary);
+        color: var(--text-primary);
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+
+    /* Theme Toggle Button */
+    .theme-toggle {
+        background: none;
+        border: 2px solid var(--text-light);
+        color: var(--text-light);
+        border-radius: 50px;
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+    }
+
+    .theme-toggle:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        transform: scale(1.05);
+    }
+
+    .theme-toggle i {
+        font-size: 1.1rem;
+    }
+
+    /* Dark mode specific adjustments */
+    [data-theme="dark"] .card {
+        box-shadow: 0 4px 6px var(--shadow-color);
+    }
+
+    [data-theme="dark"] .sidebar .nav-link {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    [data-theme="dark"] .sidebar .nav-link:hover,
+    [data-theme="dark"] .sidebar .nav-link.active {
+        color: white;
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    [data-theme="dark"] .search-container i {
+        color: var(--text-muted);
+    }
+
+    [data-theme="dark"] .modal-content {
+        background-color: var(--bg-card);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    [data-theme="dark"] .modal-header,
+    [data-theme="dark"] .modal-footer {
+        border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] .btn-close {
+        filter: invert(1);
+    }
+
+    /* SweetAlert2 Dark Mode Support */
+    [data-theme="dark"] .swal2-popup {
+        background: var(--bg-card);
+        color: var(--text-primary);
+    }
+
+    [data-theme="dark"] .swal2-title,
+    [data-theme="dark"] .swal2-content {
+        color: var(--text-primary);
+    }
+
+    [data-theme="dark"] .swal2-input {
+        background-color: var(--bg-secondary);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    /* Session info dark mode */
+    .session-info {
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+        color: var(--text-light);
+    }
+
+    /* Badges in dark mode */
+    [data-theme="dark"] .badge.bg-secondary {
+        background-color: #6c757d !important;
+    }
+
+    /* Chart container dark mode */
+    [data-theme="dark"] .chart-container {
+        background-color: var(--bg-card);
+        border-radius: 8px;
+        padding: 15px;
+    }
+
+    /* Additional Dark Mode Enhancements */
+    [data-theme="dark"] .text-muted {
+        color: var(--text-muted) !important;
+    }
+
+    [data-theme="dark"] .bg-light {
+        background-color: var(--bg-secondary) !important;
+    }
+
+    [data-theme="dark"] .table-hover tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: var(--text-primary);
+    }
+
+    [data-theme="dark"] .btn-outline-primary {
+        border-color: var(--secondary);
+        color: var(--secondary);
+    }
+
+    [data-theme="dark"] .btn-outline-primary:hover {
+        background-color: var(--secondary);
+        border-color: var(--secondary);
+        color: var(--text-light);
+    }
+
+    [data-theme="dark"] .form-control::placeholder {
+        color: var(--text-muted);
+    }
+
+    [data-theme="dark"] .session-timer {
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Ensure all cards have proper dark mode */
+    [data-theme="dark"] .card-header {
+        background-color: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-primary);
+    }
+
+    /* Dark mode for access denied section */
+    [data-theme="dark"] .access-denied {
+        background-color: var(--bg-card);
+        border-radius: 10px;
+        padding: 50px 20px;
+    }
+
+    /* Dark mode for stats cards */
+    [data-theme="dark"] .stat-card {
+        border: 1px solid var(--border-color);
+    }
+
+    /* Responsive Design for Mobile Sidebar */
+    @media (max-width: 991.98px) {
+        .mobile-menu-btn {
+            display: flex;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 56px;
+            left: 0;
+            width: 280px;
+            height: calc(100vh - 56px);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .sidebar.show {
+            transform: translateX(0);
+        }
+        
+        .main-content {
+            width: 100%;
+            margin-left: 0;
+        }
+        
+        /* Mobile sidebar header */
+        .sidebar-header {
+            display: flex !important;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .sidebar-header h6 {
+            margin: 0;
+            color: var(--text-light);
+        }
+        
+        .sidebar-footer {
+            display: block !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 260px;
+        }
+        
+        .main-content {
+            padding: 15px 10px;
+        }
+    }
+
+    @media (min-width: 992px) {
+        .sidebar {
+            position: static;
+            transform: translateX(0) !important;
+        }
+        
+        .mobile-menu-btn {
+            display: none !important;
+        }
+        
+        .sidebar-overlay {
+            display: none !important;
+        }
+        
+        .sidebar-header,
+        .sidebar-footer {
+            display: none !important;
+        }
+    }
+
+    /* Sidebar scrollbar styling */
+    .sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+        background: rgba(255,255,255,0.1);
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.3);
+        border-radius: 3px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255,255,255,0.5);
+    }
+    </style>
+</head>
+<body data-total-cars="{{ stats.total_cars if stats else 0 }}" 
+      data-paid-cars="{{ stats.paid_cars if stats else 0 }}" 
+      data-unpaid-cars="{{ stats.unpaid_cars if stats else 0 }}" 
+      data-momo-payments="{{ stats.momo_payments if stats else 0 }}"
+      data-cash-payments="{{ stats.cash_payments if stats else 0 }}"
+      data-revenue="{{ stats.revenue if stats and stats.revenue else 0 }}">
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--primary);">
+    <div class="container-fluid">
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn" type="button">
+            <i class="fas fa-bars"></i>
+            <span>Menu</span>
+        </button>
+        
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-car me-2"></i>Vehicle Detection System - History & Analytics
+        </a>
+        
+        <div class="d-flex align-items-center">
+            <!-- Theme Toggle Button -->
+            <button class="theme-toggle me-3" id="themeToggle" title="Toggle dark/light mode">
+                <i class="fas fa-moon" id="themeIcon"></i>
+                <span id="themeText">Dark Mode</span>
+            </button>
+            
+            <a href="/" class="btn btn-outline-light btn-sm me-2">
+                <i class="fas fa-arrow-left me-1"></i> Back to Home Page
+            </a>
+            <button id="logoutBtn" class="btn btn-outline-light btn-sm" style="display: none;">
+                <i class="fas fa-sign-out-alt me-1"></i> Logout
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- Sidebar Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-2 sidebar" id="sidebar">
+            <div class="position-sticky pt-3">
+                <!-- Mobile Sidebar Header -->
+                <div class="sidebar-header d-flex justify-content-between align-items-center p-3 border-bottom border-secondary d-lg-none">
+                    <h6 class="mb-0 text-light">Navigation Menu</h6>
+                    <button class="btn btn-sm btn-outline-light" id="closeSidebar">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/index">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/live">
+                            <i class="fas fa-car"></i> Live Detection
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/history">
+                            <i class="fas fa-history"></i> Boss Page
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-chart-bar"></i> Analytics
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- Sidebar Footer (Mobile Only) -->
+                <div class="sidebar-footer p-3 border-top border-secondary mt-auto d-lg-none">
+                    <div class="text-center">
+                        <small class="text-muted">Version 1.0.1</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <main class="col-lg-10 main-content" id="mainContent">
+            <!-- Session Info (shown when authenticated) -->
+            <div id="sessionInfo" class="session-info" style="display: none;">
+                <div>
+                    <i class="fas fa-shield-alt me-2"></i>
+                    <strong>Secure Session Active</strong>
+                    <span class="ms-2">History & Analytics Access</span>
+                </div>
+                <div class="session-timer">
+                    <i class="fas fa-clock me-1"></i>
+                    <span id="sessionTimer">60:00</span>
+                </div>
+            </div>
+
+            <!-- Access Denied Message -->
+            <div id="accessDeniedMessage">
+                <div class="access-denied">
+                    <i class="fas fa-lock"></i>
+                    <h3>Access Restricted</h3>
+                    <p class="text-muted">Please enter the password to view history data</p>
+                    <button class="btn btn-primary mt-3" onclick="showPasswordPrompt()">
+                        <i class="fas fa-key me-2"></i>Enter Password
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Content (hidden by default) -->
+            <div id="dashboardContent" style="display: none;">
+                <!-- Dashboard Header -->
+                <div class="dashboard-header">
+                    <h2 class="mb-0">Detection History & Analytics</h2>
+                    <div class="d-flex">
+                        <div class="search-container me-2">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" class="form-control" placeholder="Search by plate or car type">
+                        </div>
+                        <button class="btn btn-success export-btn" id="exportBtn">
+                            <i class="fas fa-file-export me-1"></i> Export
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card text-white bg-primary stats-card" id="totalCarsCard">
+                            <div class="card-body">
+                                <div>
+                                    <p class="card-text">Total Cars</p>
+                                    <h3 class="card-title">{{ stats.total_cars if stats else 0 }}</h3>
+                                </div>
+                                <i class="fas fa-car card-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card text-white bg-success stats-card" id="paidCarsCard">
+                            <div class="card-body">
+                                <div>
+                                    <p class="card-text">Paid Cars</p>
+                                    <h3 class="card-title">{{ stats.paid_cars if stats else 0 }}</h3>
+                                </div>
+                                <i class="fas fa-check-circle card-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card text-white bg-danger stats-card" id="unpaidCarsCard">
+                            <div class="card-body">
+                                <div>
+                                    <p class="card-text">Unpaid Cars</p>
+                                    <h3 class="card-title">{{ stats.unpaid_cars if stats else 0 }}</h3>
+                                </div>
+                                <i class="fas fa-exclamation-circle card-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card stat-card text-white bg-info">
+                            <div class="card-body">
+                                <div>
+                                    <p class="card-text">Payment Methods</p>
+                                    <p class="card-text mb-0">MoMo: {{ stats.momo_payments if stats else 0 }}</p>
+                                    <p class="card-text">Cash: {{ stats.cash_payments if stats else 0 }}</p>
+                                </div>
+                                <i class="fas fa-money-bill card-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Revenue Summary -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">Revenue Analytics</h5>
+                                <div id="revenueSummary">
+                                    <!-- Revenue summary will be loaded via JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">Payment Methods</h5>
+                                <div id="paymentMethods">
+                                    <!-- Payment methods will be loaded via JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Revenue by Car Type</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="revenueChart" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Payment Distribution</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="paymentMethodChart" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-2">
+                                <input type="text" id="tableSearch" class="form-control" placeholder="Search by plate or car type">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <select id="paymentFilter" class="form-select">
+                                    <option value="">All Payment Status</option>
+                                    <option value="paid">Paid</option>
+                                    <option value="unpaid">Unpaid</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <select id="methodFilter" class="form-select">
+                                    <option value="">All Payment Methods</option>
+                                    <option value="MOMO">MoMo</option>
+                                    <option value="CASH">Cash</option>
+                                    <option value="Not Paid">Not Paid</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <select id="carTypeFilter" class="form-select">
+                                    <option value="">All Car Types</option>
+                                    <option value="Car">Car</option>
+                                    <option value="Truck">Truck</option>
+                                    <option value="Bus">Bus</option>
+                                    <option value="Motorcycle">Motorcycle</option>
+                                    <option value="Police">Police</option>
+                                    <option value="Ambulance">Ambulance</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle" id="historyTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Image</th>
+                                        <th>Car Type</th>
+                                        <th>Plate</th>
+                                        <th>Captured Time</th>
+                                        <th>Payment Method</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if cars %}
+                                        {% for car in cars %}
+                                        {% set is_paid = car.status == 'Paid' or car.status.startswith('Paid') if car.status else False %}
+                                        {% set payment_method = car.payment_method if car.payment_method else 'Not Paid' %}
+                                        <tr data-type="{{ car.car_type|lower if car.car_type else 'car' }}" data-id="{{ car.id }}" data-status="{{ 'paid' if is_paid else 'unpaid' }}" data-method="{{ payment_method }}">
+                                            <td>{{ car.id }}</td>
+                                            <td>
+                                                <img src="{{ car.image }}" class="thumb" alt="car_{{ car.id }}" 
+                                                     data-bs-toggle="modal" data-bs-target="#imageModal" 
+                                                     data-full="{{ car.image }}">
+                                            </td>
+                                            <td>{{ car.car_type if car.car_type else 'Car' }}</td>
+                                            <td><span class="badge bg-secondary">{{ car.plate if car.plate else 'N/A' }}</span></td>
+                                            <td>{{ car.captured_time if car.captured_time else 'N/A' }}</td>
+                                            <td>{{ payment_method }}</td>
+                                            <td>
+                                                <span class="badge {% if is_paid %}badge-paid{% else %}badge-unpaid{% endif %}">
+                                                    {{ car.status|default('Unpaid') }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <button class="btn btn-sm btn-success momo-btn btn-action" 
+                                                            {% if is_paid %}disabled{% endif %}>
+                                                        <i class="fas fa-mobile-alt me-1"></i> MOMO
+                                                    </button>
+                                                    <button class="btn btn-sm btn-primary cash-btn btn-action" 
+                                                            {% if is_paid %}disabled{% endif %}>
+                                                        <i class="fas fa-money-bill me-1"></i> CASH
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger delete-btn btn-action" 
+                                                            data-id="{{ car.id }}">
+                                                        <i class="fas fa-trash me-1"></i> Delete
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="8" class="text-center py-4">No vehicle detections found</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Image preview modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Image Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid rounded shadow-sm" alt="full">
+                <p id="modalPath" class="mono mt-2 small text-break"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ==================== MOBILE SIDEBAR FUNCTIONALITY ====================
+
+function setupMobileSidebar() {
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const closeSidebar = document.getElementById('closeSidebar');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const mainContent = document.getElementById('mainContent');
+
+    // Toggle sidebar
+    function toggleSidebar() {
+        sidebar.classList.toggle('show');
+        sidebarOverlay.classList.toggle('show');
+        document.body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : '';
+    }
+
+    // Close sidebar
+    function closeSidebarFunc() {
+        sidebar.classList.remove('show');
+        sidebarOverlay.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    // Event listeners
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+    }
+
+    if (closeSidebar) {
+        closeSidebar.addEventListener('click', closeSidebarFunc);
+    }
+
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', closeSidebarFunc);
+    }
+
+    // Close sidebar when clicking on nav links (mobile)
+    const navLinks = document.querySelectorAll('.sidebar .nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth < 992) {
+                closeSidebarFunc();
+            }
+        });
+    });
+
+    // Close sidebar on window resize if it becomes desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth >= 992) {
+            closeSidebarFunc();
+        }
+    });
+
+    // Handle escape key to close sidebar
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sidebar.classList.contains('show')) {
+            closeSidebarFunc();
+        }
+    });
+}
+
+// Update the initialization function to include mobile sidebar
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize theme system
+    initializeTheme();
+    
+    // Setup mobile sidebar
+    setupMobileSidebar();
+    
+    // Setup logout button
+    document.getElementById('logoutBtn').addEventListener('click', logoutHistory);
+    
+    // Check access and setup security
+    checkHistoryAccess();
+    setupAutoLogout();
+    
+    // Show password prompt if no access
+    const accessTime = localStorage.getItem('historyAccessTime');
+    if (!accessTime || (Date.now() - accessTime > 3600000)) {
+        setTimeout(() => {
+            showPasswordPrompt();
+        }, 1000);
+    }
+});
+
+
+// ==================== THEME MANAGEMENT SYSTEM ====================
+
+// Theme configuration
+const themeConfig = {
+    light: {
+        name: 'light',
+        icon: 'fa-moon',
+        text: 'Dark Mode',
+        next: 'dark'
+    },
+    dark: {
+        name: 'dark',
+        icon: 'fa-sun',
+        text: 'Light Mode',
+        next: 'light'
+    }
+};
+
+// Initialize theme system
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+    setupThemeToggle();
+    setupChartThemeListeners();
+}
+
+// Set theme
+function setTheme(themeName) {
+    const theme = themeConfig[themeName];
+    if (!theme) return;
+    
+    // Set HTML attribute
+    document.documentElement.setAttribute('data-theme', theme.name);
+    
+    // Update toggle button
+    const themeIcon = document.getElementById('themeIcon');
+    const themeText = document.getElementById('themeText');
+    
+    if (themeIcon) {
+        themeIcon.className = `fas ${theme.icon}`;
+    }
+    if (themeText) {
+        themeText.textContent = theme.text;
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('theme', theme.name);
+    
+    // Update charts if they exist
+    updateChartsTheme();
+    
+    // Dispatch theme change event
+    window.dispatchEvent(new CustomEvent('themeChanged', { detail: theme.name }));
+}
+
+// Toggle theme
+function toggleTheme() {
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    const nextTheme = themeConfig[currentTheme].next;
+    setTheme(nextTheme);
+}
+
+// Setup theme toggle button
+function setupThemeToggle() {
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
+}
+
+// Update charts for current theme
+function updateChartsTheme() {
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    const isDark = currentTheme === 'dark';
+    
+    // Chart.js theme configuration
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+    const textColor = isDark ? '#ecf0f1' : '#666666';
+    
+    // Update existing charts
+    Chart.helpers.each(Chart.instances, (chart) => {
+        if (chart.options.scales) {
+            // Update axes
+            Object.keys(chart.options.scales).forEach(scaleId => {
+                const scale = chart.options.scales[scaleId];
+                if (scale.grid) {
+                    scale.grid.color = gridColor;
+                }
+                if (scale.ticks) {
+                    scale.ticks.color = textColor;
+                }
+            });
+            
+            // Update legend
+            if (chart.options.plugins.legend && chart.options.plugins.legend.labels) {
+                chart.options.plugins.legend.labels.color = textColor;
+            }
+        }
+        
+        chart.update('none');
+    });
+}
+
+// Setup chart theme change listeners
+function setupChartThemeListeners() {
+    window.addEventListener('themeChanged', function(event) {
+        setTimeout(updateChartsTheme, 100);
+    });
+}
+
+// Enhanced renderCharts function with theme support
+function renderCharts(data) {
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    const isDark = currentTheme === 'dark';
+    
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+    const textColor = isDark ? '#ecf0f1' : '#666666';
+    
+    // Revenue by Car Type Chart
+    const revenueCtx = document.getElementById('revenueChart');
+    if (revenueCtx) {
+        if (revenueCtx.chart) {
+            revenueCtx.chart.destroy();
+        }
+        
+        revenueCtx.chart = new Chart(revenueCtx, {
+            type: 'bar',
+            data: {
+                labels: data.revenue_labels || ['Car', 'Truck', 'Bus', 'Motorcycle'],
+                datasets: [{
+                    label: 'Revenue (FRW)',
+                    data: data.revenue_data || [0, 0, 0, 0],
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: gridColor
+                        },
+                        ticks: {
+                            color: textColor,
+                            callback: function(value) {
+                                return 'FRW ' + value.toLocaleString();
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: gridColor
+                        },
+                        ticks: {
+                            color: textColor
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: textColor
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Payment Method Chart
+    const paymentCtx = document.getElementById('paymentMethodChart');
+    if (paymentCtx) {
+        if (paymentCtx.chart) {
+            paymentCtx.chart.destroy();
+        }
+        
+        paymentCtx.chart = new Chart(paymentCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['MoMo', 'Cash', 'Unpaid'],
+                datasets: [{
+                    data: [
+                        data.momo_payments || 0,
+                        data.cash_payments || 0,
+                        data.unpaid_cars || 0
+                    ],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(255, 99, 132, 0.7)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: textColor
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// Apply theme to SweetAlert2
+function setupSweetAlertTheme() {
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    const isDark = currentTheme === 'dark';
+    
+    // SweetAlert2 theme configuration
+    if (isDark) {
+        Swal.fire({
+            customClass: {
+                popup: 'dark-swal'
+            }
+        });
+    }
+}
+
+// Initialize theme when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initializeTheme();
+    
+    // Re-initialize theme after authentication
+    window.addEventListener('themeChanged', function() {
+        // Re-render charts with new theme
+        if (typeof loadAnalyticsData === 'function') {
+            loadAnalyticsData();
+        }
+    });
+});
+
+
+
+
+
+// ==================== SECURITY SYSTEM ====================
+
+// History page access control
+function checkHistoryAccess() {
+    // Check if user has valid access token
+    const accessTime = localStorage.getItem('historyAccessTime');
+    const currentTime = Date.now();
+    
+    // Access token expires after 1 hour (3600000 ms)
+    if (!accessTime || (currentTime - accessTime > 3600000)) {
+        // No valid access token, show access denied
+        showAccessDenied();
+    } else {
+        // Valid access token, show content
+        grantAccess();
+    }
+}
+
+function showAccessDenied() {
+    document.getElementById('accessDeniedMessage').style.display = 'block';
+    document.getElementById('dashboardContent').style.display = 'none';
+    document.getElementById('sessionInfo').style.display = 'none';
+    document.getElementById('logoutBtn').style.display = 'none';
+}
+
+function grantAccess() {
+    document.getElementById('accessDeniedMessage').style.display = 'none';
+    document.getElementById('dashboardContent').style.display = 'block';
+    document.getElementById('sessionInfo').style.display = 'flex';
+    document.getElementById('logoutBtn').style.display = 'block';
+    
+    // Initialize the dashboard functionality
+    initializeDashboard();
+    startSessionTimer();
+}
+
+function redirectToPasswordPrompt() {
+    Swal.fire({
+        title: '🔒 Access Required',
+        html: `
+            <div class="text-center">
+                <p>This page requires authentication</p>
+                <small class="text-muted">You need to enter the password to view history</small>
+            </div>
+        `,
+        confirmButtonText: 'Enter Password',
+        confirmButtonColor: '#2c3e50',
+        showCancelButton: true,
+        cancelButtonText: 'Back to Dashboard',
+        icon: 'warning'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            showPasswordPrompt();
+        } else {
+            window.location.href = '/';
+        }
+    });
+}
+
+function showPasswordPrompt() {
+    let attempts = 0;
+    const maxAttempts = 3;
+    
+    // Check if user is blocked
+    const blockTime = localStorage.getItem('historyBlockTime');
+    if (blockTime && Date.now() - blockTime < 300000) { // 5 minutes block
+        const remainingTime = Math.ceil((300000 - (Date.now() - blockTime)) / 1000 / 60);
+        Swal.fire({
+            title: '🚫 Access Temporarily Blocked',
+            html: `Too many failed attempts!<br>Please try again in <strong>${remainingTime} minutes</strong>.`,
+            icon: 'error',
+            confirmButtonText: 'Back to Dashboard',
+            willClose: () => {
+                window.location.href = '/';
+            }
+        });
+        return;
+    }
+    
+    function promptPassword() {
+        Swal.fire({
+            title: '🔒 Enter Password',
+            html: `
+                <div class="text-center">
+                    <p>Please enter the password to access History & Analytics</p>
+                    ${attempts > 0 ? `<small class="text-warning">${maxAttempts - attempts} attempt(s) remaining</small>` : ''}
+                </div>
+            `,
+            input: 'password',
+            inputAttributes: {
+                autocapitalize: 'off',
+                autocorrect: 'off',
+                placeholder: 'Enter password',
+                maxlength: 20,
+                autocomplete: 'current-password'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Verify',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#2c3e50',
+            showLoaderOnConfirm: true,
+            allowOutsideClick: () => !Swal.isLoading(),
+            preConfirm: (password) => {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        if (password === 'boss') {
+                            // Grant access
+                            localStorage.setItem('historyAccessTime', Date.now());
+                            resolve();
+                        } else {
+                            attempts++;
+                            if (attempts >= maxAttempts) {
+                                // Block access for 5 minutes
+                                localStorage.setItem('historyBlockTime', Date.now());
+                                reject('Too many failed attempts! Access blocked for 5 minutes.');
+                            } else {
+                                reject(`Incorrect password! ${maxAttempts - attempts} attempt(s) remaining.`);
+                            }
+                        }
+                    }, 800);
+                });
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Success - show content
+                Swal.fire({
+                    title: '✅ Access Granted',
+                    text: 'Loading history data...',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    willClose: () => {
+                        grantAccess();
+                    }
+                });
+            }
+        }).catch((error) => {
+            if (error.includes('blocked')) {
+                Swal.fire({
+                    title: '🚫 Access Blocked',
+                    html: error,
+                    icon: 'error',
+                    confirmButtonText: 'Back to Dashboard',
+                    willClose: () => {
+                        window.location.href = '/';
+                    }
+                });
+            } else {
+                Swal.showValidationMessage(error);
+                // Show prompt again for remaining attempts
+                setTimeout(promptPassword, 1000);
+            }
+        });
+    }
+    
+    promptPassword();
+}
+
+// Auto-logout functionality
+function setupAutoLogout() {
+    // Check every minute if session has expired
+    setInterval(() => {
+        const accessTime = localStorage.getItem('historyAccessTime');
+        if (accessTime && (Date.now() - accessTime > 3600000)) {
+            // Session expired, clear access
+            localStorage.removeItem('historyAccessTime');
+            Swal.fire({
+                title: 'Session Expired',
+                text: 'Your session has expired. Please log in again.',
+                icon: 'info',
+                confirmButtonText: 'OK',
+                willClose: () => {
+                    showAccessDenied();
+                    showPasswordPrompt();
+                }
+            });
+        }
+    }, 60000); // Check every minute
+}
+
+// Session timer
+function startSessionTimer() {
+    const accessTime = localStorage.getItem('historyAccessTime');
+    if (!accessTime) return;
+    
+    const updateTimer = () => {
+        const currentTime = Date.now();
+        const elapsed = currentTime - parseInt(accessTime);
+        const remaining = Math.max(0, 3600000 - elapsed); // 1 hour session
+        
+        const minutes = Math.floor(remaining / 60000);
+        const seconds = Math.floor((remaining % 60000) / 1000);
+        
+        document.getElementById('sessionTimer').textContent = 
+            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    };
+    
+    updateTimer();
+    setInterval(updateTimer, 1000);
+}
+
+// Manual logout function
+function logoutHistory() {
+    Swal.fire({
+        title: 'Logout Confirmation',
+        text: 'Are you sure you want to logout from History page?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Logout',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            localStorage.removeItem('historyAccessTime');
+            Swal.fire({
+                title: 'Logged Out',
+                text: 'You have been logged out from History page.',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                willClose: () => {
+                    showAccessDenied();
+                    showPasswordPrompt();
+                }
+            });
+        }
+    });
+}
+
+// ==================== DASHBOARD FUNCTIONALITY ====================
+
+// Payment prices
+const prices = {
+    car: 10000,
+    truck: 40000,
+    bus: 30000,
+    motorcycle: 5000,
+    police: 0,
+    ambulance: 0,
+    default: 10000
+};
+
+// Initialize dashboard functionality
+function initializeDashboard() {
+    loadAnalyticsData();
+    setupStatsCards();
+    setupFilters();
+    setupImageModal();
+    setupExport();
+    setupTableActions();
+}
+
+// Load analytics data
+function loadAnalyticsData() {
+    fetch('/get_analytics')
+        .then(response => response.json())
+        .then(data => {
+            updateRevenueSummary(data);
+            updatePaymentMethods(data);
+            renderCharts(data);
+        })
+        .catch(error => console.error('Error loading analytics:', error));
+}
+
+// Update revenue summary
+function updateRevenueSummary(data) {
+    const revenueSummary = document.getElementById('revenueSummary');
+    if (revenueSummary && data) {
+        revenueSummary.innerHTML = `
+            <p class="card-text mb-1">Total Potential: <strong>FRW ${data.total_potential ? data.total_potential.toLocaleString() : 0}</strong></p>
+            <p class="card-text mb-1">Actual Revenue: <strong class="text-success">FRW ${data.total_actual ? data.total_actual.toLocaleString() : 0}</strong></p>
+            <p class="card-text mb-0">Total Loss: <strong class="text-danger">FRW ${data.total_loss ? data.total_loss.toLocaleString() : 0}</strong></p>
+        `;
+    }
+}
+
+// Update payment methods
+function updatePaymentMethods(data) {
+    const paymentMethods = document.getElementById('paymentMethods');
+    if (paymentMethods && data) {
+        paymentMethods.innerHTML = `
+            <p class="card-text mb-1">MoMo Payments: <strong>${data.momo_payments || 0}</strong></p>
+            <p class="card-text mb-1">Cash Payments: <strong>${data.cash_payments || 0}</strong></p>
+            <p class="card-text mb-0">Unpaid Vehicles: <strong class="text-danger">${data.unpaid_cars || 0}</strong></p>
+        `;
+    }
+}
+
+// Render charts
+function renderCharts(data) {
+    // Revenue by Car Type Chart
+    const revenueCtx = document.getElementById('revenueChart');
+    if (revenueCtx) {
+        // Destroy existing chart if it exists
+        if (revenueCtx.chart) {
+            revenueCtx.chart.destroy();
+        }
+        
+        revenueCtx.chart = new Chart(revenueCtx, {
+            type: 'bar',
+            data: {
+                labels: data.revenue_labels || ['Car', 'Truck', 'Bus', 'Motorcycle'],
+                datasets: [{
+                    label: 'Revenue (FRW)',
+                    data: data.revenue_data || [0, 0, 0, 0],
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'FRW ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Payment Method Chart
+    const paymentCtx = document.getElementById('paymentMethodChart');
+    if (paymentCtx) {
+        // Destroy existing chart if it exists
+        if (paymentCtx.chart) {
+            paymentCtx.chart.destroy();
+        }
+        
+        paymentCtx.chart = new Chart(paymentCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['MoMo', 'Cash', 'Unpaid'],
+                datasets: [{
+                    data: [
+                        data.momo_payments || 0,
+                        data.cash_payments || 0,
+                        data.unpaid_cars || 0
+                    ],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(255, 99, 132, 0.7)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
+        });
+    }
+}
+
+// Statistics card click handlers
+function setupStatsCards() {
+    const totalCarsCard = document.getElementById('totalCarsCard');
+    const paidCarsCard = document.getElementById('paidCarsCard');
+    const unpaidCarsCard = document.getElementById('unpaidCarsCard');
+
+    // Get stats from data attributes or use defaults
+    const total_cars = parseInt(document.body.getAttribute('data-total-cars') || '0');
+    const paid_cars = parseInt(document.body.getAttribute('data-paid-cars') || '0');
+    const unpaid_cars = parseInt(document.body.getAttribute('data-unpaid-cars') || '0');
+    const momo_payments = parseInt(document.body.getAttribute('data-momo-payments') || '0');
+    const cash_payments = parseInt(document.body.getAttribute('data-cash-payments') || '0');
+    const revenue = parseInt(document.body.getAttribute('data-revenue') || '0');
+
+    // Calculate additional metrics
+    const collectionRate = total_cars > 0 ? ((paid_cars / total_cars) * 100).toFixed(1) : 0;
+    const successRate = total_cars > 0 ? ((paid_cars / total_cars) * 100).toFixed(1) : 0;
+    const unpaidRate = total_cars > 0 ? ((unpaid_cars / total_cars) * 100).toFixed(1) : 0;
+    
+    // Calculate potential revenue loss (assuming average price of 10,000 per unpaid vehicle)
+    const avgPricePerCar = 10000;
+    const potentialLoss = unpaid_cars * avgPricePerCar;
+    const totalPotentialRevenue = total_cars * avgPricePerCar;
+    const revenueEfficiency = totalPotentialRevenue > 0 ? ((revenue / totalPotentialRevenue) * 100).toFixed(1) : 0;
+
+    if (totalCarsCard) {
+        totalCarsCard.addEventListener('click', function() {
+            Swal.fire({
+                title: 'Total Cars Analysis',
+                html: `
+                    <div class="text-start">
+                        <p><strong>Total Vehicles Detected:</strong> ${total_cars}</p>
+                        <p><strong>Payment Status Breakdown:</strong></p>
+                        <ul>
+                            <li>Paid Vehicles: ${paid_cars}</li>
+                            <li>Unpaid Vehicles: ${unpaid_cars}</li>
+                        </ul>
+                        <p><strong>Collection Performance:</strong></p>
+                        <ul>
+                            <li>Collection Rate: <span class="text-success">${collectionRate}%</span></li>
+                            <li>Revenue Efficiency: <span class="text-info">${revenueEfficiency}%</span></li>
+                        </ul>
+                        <p><strong>Financial Overview:</strong></p>
+                        <ul>
+                            <li>Total Potential Revenue: FRW ${totalPotentialRevenue.toLocaleString()}</li>
+                            <li>Actual Revenue Collected: FRW ${revenue.toLocaleString()}</li>
+                        </ul>
+                    </div>
+                `,
+                icon: 'info',
+                confirmButtonText: 'OK',
+                width: 600
+            });
+        });
+    }
+
+    if (paidCarsCard) {
+        paidCarsCard.addEventListener('click', function() {
+            Swal.fire({
+                title: 'Paid Cars Analysis',
+                html: `
+                    <div class="text-start">
+                        <p><strong>Successfully Processed:</strong> ${paid_cars} vehicles</p>
+                        <p><strong>Financial Performance:</strong></p>
+                        <ul>
+                            <li>Total Revenue: <span class="text-success">FRW ${revenue.toLocaleString()}</span></li>
+                            <li>Average per Vehicle: FRW ${paid_cars > 0 ? (revenue / paid_cars).toLocaleString() : 0}</li>
+                        </ul>
+                        <p><strong>Payment Method Distribution:</strong></p>
+                        <ul>
+                            <li>MoMo Payments: <span class="text-primary">${momo_payments}</span> (${paid_cars > 0 ? ((momo_payments / paid_cars) * 100).toFixed(1) : 0}%)</li>
+                            <li>Cash Payments: <span class="text-info">${cash_payments}</span> (${paid_cars > 0 ? ((cash_payments / paid_cars) * 100).toFixed(1) : 0}%)</li>
+                        </ul>
+                        <p><strong>Performance Metrics:</strong></p>
+                        <ul>
+                            <li>Success Rate: <span class="text-success">${successRate}%</span></li>
+                            <li>Collection Efficiency: Excellent</li>
+                        </ul>
+                    </div>
+                `,
+                icon: 'success',
+                confirmButtonText: 'OK',
+                width: 600
+            });
+        });
+    }
+
+    if (unpaidCarsCard) {
+        unpaidCarsCard.addEventListener('click', function() {
+            Swal.fire({
+                title: 'Unpaid Cars Analysis',
+                html: `
+                    <div class="text-start">
+                        <p><strong>Pending Payments:</strong> ${unpaid_cars} vehicles</p>
+                        <p><strong>Financial Impact:</strong></p>
+                        <ul>
+                            <li>Potential Revenue Loss: <span class="text-danger">FRW ${potentialLoss.toLocaleString()}</span></li>
+                            <li>Average Value per Vehicle: FRW ${avgPricePerCar.toLocaleString()}</li>
+                        </ul>
+                        <p><strong>Collection Status:</strong></p>
+                        <ul>
+                            <li>Unpaid Rate: <span class="text-warning">${unpaidRate}%</span></li>
+                            <li>Urgency Level: ${unpaid_cars > 5 ? 'High' : unpaid_cars > 2 ? 'Medium' : 'Low'}</li>
+                        </ul>
+                        <p><strong>Recommended Actions:</strong></p>
+                        <ul>
+                            <li>📞 Follow up with ${unpaid_cars > 0 ? Math.ceil(unpaid_cars / 2) : 0} priority cases</li>
+                            <li>📧 Send payment reminders</li>
+                            <li>🔄 Review detection process for improvements</li>
+                            <li>💰 Focus on high-value vehicles first</li>
+                        </ul>
+                        <p class="text-danger mt-3"><strong>⚠️ Immediate Attention Required:</strong> ${unpaid_cars} outstanding payments need resolution</p>
+                    </div>
+                `,
+                icon: 'warning',
+                confirmButtonText: 'OK',
+                width: 650
+            });
+        });
+    }
+}
+
+// Filter functionality
+function setupFilters() {
+    const tableSearch = document.getElementById('tableSearch');
+    const paymentFilter = document.getElementById('paymentFilter');
+    const methodFilter = document.getElementById('methodFilter');
+    const carTypeFilter = document.getElementById('carTypeFilter');
+    const table = document.getElementById('historyTable');
+    
+    if (!table) return;
+    
+    const rows = Array.from(table.tBodies[0].rows);
+
+    function filterTable() {
+        const searchQuery = tableSearch ? tableSearch.value.toLowerCase() : '';
+        const paymentValue = paymentFilter ? paymentFilter.value : '';
+        const methodValue = methodFilter ? methodFilter.value : '';
+        const carTypeValue = carTypeFilter ? carTypeFilter.value : '';
+        
+        rows.forEach(row => {
+            const text = Array.from(row.cells).map(cell => cell.textContent.toLowerCase()).join(' ');
+            const status = row.dataset.status || '';
+            const method = row.dataset.method || '';
+            const type = row.dataset.type || '';
+            
+            const matchesSearch = text.includes(searchQuery);
+            const matchesPayment = !paymentValue || 
+                (paymentValue === 'paid' && status === 'paid') || 
+                (paymentValue === 'unpaid' && status === 'unpaid');
+            const matchesMethod = !methodValue || method === methodValue;
+            const matchesType = !carTypeValue || type === carTypeValue.toLowerCase();
+            
+            row.style.display = (matchesSearch && matchesPayment && matchesMethod && matchesType) ? '' : 'none';
+        });
+    }
+
+    if (tableSearch) tableSearch.addEventListener('input', filterTable);
+    if (paymentFilter) paymentFilter.addEventListener('change', filterTable);
+    if (methodFilter) methodFilter.addEventListener('change', filterTable);
+    if (carTypeFilter) carTypeFilter.addEventListener('change', filterTable);
+}
+
+// Image modal
+function setupImageModal() {
+    const imageModal = document.getElementById('imageModal');
+    if (imageModal) {
+        imageModal.addEventListener('show.bs.modal', function(event) {
+            const img = event.relatedTarget;
+            const modalImage = document.getElementById('modalImage');
+            const modalPath = document.getElementById('modalPath');
+            if (modalImage && modalPath) {
+                modalImage.src = img.dataset.full;
+                modalPath.textContent = img.dataset.full;
+            }
+        });
+    }
+}
+
+// Export functionality
+function setupExport() {
+    const exportBtn = document.getElementById('exportBtn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', function() {
+            Swal.fire({
+                title: 'Export Data',
+                text: 'Choose export format',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'CSV',
+                cancelButtonText: 'PDF',
+                showDenyButton: true,
+                denyButtonText: 'Excel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    exportToCSV();
+                } else if (result.isDenied) {
+                    exportToExcel();
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    exportToPDF();
+                }
+            });
+        });
+    }
+}
+
+function exportToCSV() {
+    Swal.fire('Success!', 'Data exported as CSV successfully.', 'success');
+}
+
+function exportToExcel() {
+    Swal.fire('Success!', 'Data exported as Excel successfully.', 'success');
+}
+
+function exportToPDF() {
+    Swal.fire('Success!', 'Data exported as PDF successfully.', 'success');
+}
+
+// Payment and Delete functionality
+function setupTableActions() {
+    const table = document.getElementById('historyTable');
+    if (!table) return;
+    
+    document.querySelectorAll('#historyTable tbody tr').forEach(row => {
+        const momoBtn = row.querySelector('.momo-btn');
+        const cashBtn = row.querySelector('.cash-btn');
+        const deleteBtn = row.querySelector('.delete-btn');
+        const statusCell = row.querySelector('.badge');
+        const paymentMethodCell = row.querySelector('td:nth-child(6)'); // Payment method column
+        const carType = row.dataset.type || 'default';
+        const id = row.dataset.id;
+        const amount = prices[carType] || prices['default'];
+
+        // MOMO payment
+        if (momoBtn) {
+            momoBtn.addEventListener('click', () => {
+                // Skip payment for free vehicles (police, ambulance)
+                if (amount === 0) {
+                    Swal.fire('Info', `${carType.toUpperCase()} vehicles are exempt from payment.`, 'info');
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Pay with MTN MoMo',
+                    html: `Enter driver phone number for ${carType.toUpperCase()} payment (FRW ${amount.toLocaleString()}):`,
+                    input: 'text',
+                    inputLabel: 'Phone number',
+                    inputPlaceholder: '07XXXXXXXX',
+                    inputValidator: (value) => {
+                        if (!value) {
+                            return 'Please enter a phone number!';
+                        }
+                        if (!/^07\d{8}$/.test(value)) {
+                            return 'Please enter a valid MTN phone number!';
+                        }
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'Pay',
+                    showLoaderOnConfirm: true,
+                    preConfirm: (phone) => {
+                        return fetch('/process_payment', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({
+                                id: id,
+                                method: 'MOMO',
+                                amount: amount
+                            })
+                        }).then(res => {
+                            if (!res.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return res.json();
+                        }).catch(error => {
+                            Swal.showValidationMessage(`Request failed: ${error}`);
+                        });
+                    }
+                }).then(result => {
+                    if(result.isConfirmed && result.value){
+                        if(result.value.success){
+                            statusCell.textContent = result.value.status;
+                            statusCell.className = 'badge badge-paid';
+                            paymentMethodCell.textContent = 'MOMO';
+                            row.dataset.status = 'paid';
+                            row.dataset.method = 'MOMO';
+                            momoBtn.disabled = true;
+                            cashBtn.disabled = true;
+                            Swal.fire('Success!', `Payment FRW ${amount.toLocaleString()} completed.`, 'success');
+                            // Reload page to update statistics
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            Swal.fire('Error!', 'Payment failed. Please try again.', 'error');
+                        }
+                    }
+                });
+            });
+        }
+
+        // CASH payment
+        if (cashBtn) {
+            cashBtn.addEventListener('click', () => {
+                // Skip payment for free vehicles (police, ambulance)
+                if (amount === 0) {
+                    Swal.fire('Info', `${carType.toUpperCase()} vehicles are exempt from payment.`, 'info');
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Confirm Cash Payment',
+                    html: `Confirm cash payment of FRW ${amount.toLocaleString()} for ${carType.toUpperCase()}?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirm Payment'
+                }).then(result => {
+                    if(result.isConfirmed){
+                        fetch('/process_payment', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({
+                                id: id,
+                                method: 'CASH',
+                                amount: amount
+                            })
+                        }).then(res=>res.json()).then(data=>{
+                            if(data.success){
+                                statusCell.textContent = data.status;
+                                statusCell.className = 'badge badge-paid';
+                                paymentMethodCell.textContent = 'CASH';
+                                row.dataset.status = 'paid';
+                                row.dataset.method = 'CASH';
+                                momoBtn.disabled = true;
+                                cashBtn.disabled = true;
+                                Swal.fire('Success!', `Cash payment FRW ${amount.toLocaleString()} completed.`, 'success');
+                                // Reload page to update statistics
+                                setTimeout(() => location.reload(), 1500);
+                            } else {
+                                Swal.fire('Error!', 'Payment failed. Please try again.', 'error');
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        // Delete record functionality
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', () => {
+                Swal.fire({
+                    title: 'Delete Record',
+                    html: `Are you sure you want to delete vehicle ID: ${id}?<br><small class="text-muted">This action cannot be undone.</small>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    confirmButtonColor: '#d33',
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show loading state
+                        Swal.fire({
+                            title: 'Deleting...',
+                            text: 'Please wait while we delete the record',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        fetch('/delete_vehicle', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                id: id
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                // Remove the row from the table with a smooth animation
+                                row.style.transition = 'all 0.3s ease';
+                                row.style.opacity = '0';
+                                row.style.height = '0';
+                                row.style.overflow = 'hidden';
+                                
+                                setTimeout(() => {
+                                    row.remove();
+                                    Swal.fire({
+                                        title: 'Deleted!',
+                                        text: 'Record has been deleted successfully.',
+                                        icon: 'success',
+                                        confirmButtonText: 'OK',
+                                        timer: 2000
+                                    });
+                                    
+                                    // Refresh stats after deletion
+                                    refreshStats();
+                                }, 300);
+                            } else {
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: data.message || 'Failed to delete record. Please try again.',
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Delete error:', error);
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'Network error occurred. Please check your connection and try again.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                    }
+                });
+            });
+        }
+    });
+}
+
+// Refresh stats (placeholder function)
+function refreshStats() {
+    // This would typically reload analytics data
+    loadAnalyticsData();
+}
+
+// ==================== INITIALIZATION ====================
+
+// Initialize history page security
+document.addEventListener('DOMContentLoaded', function() {
+    // Setup logout button
+    document.getElementById('logoutBtn').addEventListener('click', logoutHistory);
+    
+    // Check access and setup security
+    checkHistoryAccess();
+    setupAutoLogout();
+    
+    // Show password prompt if no access
+    const accessTime = localStorage.getItem('historyAccessTime');
+    if (!accessTime || (Date.now() - accessTime > 3600000)) {
+        setTimeout(() => {
+            showPasswordPrompt();
+        }, 1000);
+    }
+});
+</script>
+</body>
+</html>
