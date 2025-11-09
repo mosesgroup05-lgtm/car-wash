@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: car-detection
+    env: python
+    region: oregon  # you can change this region if needed
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: DB_HOST
+        value: your-remote-mysql-host
+      - key: DB_USER
+        value: your-db-username
+      - key: DB_PASS
+        value: your-db-password
+      - key: DB_NAME
+        value: car_detection
+      - key: VIDEO_SOURCE
+        value: ""  # leave empty or put your video URL
